@@ -1,31 +1,35 @@
+import logging
+import re
 from subprocess import Popen, PIPE
-import re, logging
-
 from TickActor import TickActor
 
-LONG_PRESS_IN_SECONDS = 5
 
 class NfcActor(TickActor):
-    def __init__(self, tagActor, sleepSeconds):
-        super(NfcActor, self).__init__(sleepSeconds)
+    def __init__(self, config, tagActor):
+        super(NfcActor, self).__init__(config)
 
-        self.tagActor = tagActor
+        self._config = config
+        self._tagActor = tagActor
 
-        self.currentTag = None
+        self._currentTag = None
+        self._longPressInSeconds = config.getfloat('DEFAULT',
+                                                   'longPressInSeconds',
+                                                   fallback=5)
 
     def doTick(self):
         tag = self.getTag()
-        if tag != self.currentTag:
-            self.currentTag = tag
-            if tag != None:
+        if tag is not self._currentTag:
+            self._currentTag = tag
+            if tag is not None:
                 self.doAction(tag)
 
     def doAction(self, tag):
-        logging.getLogger('sabp').info('Calling tagActor.playByTag() with tag: %s' % tag)
-        self.tagActor.playByTag(tag)
+        logging.getLogger('sabp').info(
+            'Calling tagActor.playByTag() with tag: %s' % tag)
+        self._tagActor.playByTag(tag)
 
     def getCurrentTag(self):
-        return self.currentTag
+        return self._currentTag
 
     def getTag(self):
         p = Popen("nfc-list", shell=True, stdout=PIPE, stderr=PIPE)

@@ -1,12 +1,17 @@
-import pykka, logging, json
+import json
+import logging
+import pykka
 
-TAGS_FILE = 'data/tags.json'
 
 class TagActor(pykka.ThreadingActor):
-    def __init__(self, stateActor):
+    def __init__(self, config, stateActor):
         super(TagActor, self).__init__()
 
+        self.config = config
         self.stateActor = stateActor
+
+        self.tagsFilePath = config.get('TagActor', 'tagsFilePath',
+                                       fallback='data/tags.json')
 
     def playByTag(self, tag, fromStart=False):
         try:
@@ -17,7 +22,7 @@ class TagActor(pykka.ThreadingActor):
 
     def addTag(self, name):
         tag = self.getTagActor().getTag().get()
-        if tag != None:
+        if tag is not None:
             tags = self.loadTags()
             tags[tag] = name
             self.saveTags(tags)
@@ -32,13 +37,14 @@ class TagActor(pykka.ThreadingActor):
 
     def loadTags(self):
         try:
-            with open(TAGS_FILE, 'r') as tagsFile:
+            with open(self.tagsFilePath, 'r') as tagsFile:
                 return json.load(tagsFile)
         except (IOError, ValueError) as e:
-            logging.getLogger('sabp').error('Unable to load tag file %s' % TAGS_FILE)
+            logging.getLogger('sabp').error('Unable to load tag file %s' %
+                                            self.tagsFilePath)
             logging.getLogger('sabp').exception(e)
             return {}
 
     def saveTags(self, state):
-        with open(TAGS_FILE, 'w') as tagsFile:
+        with open(self.tagsFilePath, 'w') as tagsFile:
             json.dump(state, tagsFile)

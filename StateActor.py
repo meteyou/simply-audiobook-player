@@ -1,19 +1,23 @@
-import json, logging
+import json
+import logging
 
 from TickActor import TickActor
 
-STATE_FILE = 'data/state.json'
 
 class StateActor(TickActor):
-    def __init__(self, mpdActor, sleepSeconds):
-        super(StateActor, self).__init__(sleepSeconds)
+    def __init__(self, config, mpdActor):
+        super(StateActor, self).__init__(config)
 
+        self.config = config
         self.mpdActor = mpdActor
+
+        self.stateFilePath = config.get('StateActor', 'stateFilePath',
+                                     fallback='data/state.json')
 
     def doTick(self):
 
         current = self.mpdActor.getCurrentSong().get()
-        if current == None:
+        if current is None:
             return
 
         state = self.loadState()
@@ -38,7 +42,7 @@ class StateActor(TickActor):
 
     def playLast(self, relativeElapsed=0):
         name = self.getCurrent()
-        if name != None:
+        if name is not None:
             elapsed = self.getElapsed(name) + relativeElapsed
             if elapsed < 0:
                 elapsed = 0
@@ -50,7 +54,8 @@ class StateActor(TickActor):
         try:
             return state["current"]["name"]
         except KeyError:
-            logging.getLogger('sabp').info('No info of currently played file. Probably a fresh start.')
+            logging.getLogger('sabp').info(
+                'No info of currently played file. Probably a fresh start.')
             return None
 
     def getElapsed(self, name):
@@ -58,16 +63,18 @@ class StateActor(TickActor):
         try:
             return state["played"][name]
         except KeyError:
-            logging.getLogger('sabp').info('No info of elapsed seconds of file %s. Playing from start.' % name)
+            logging.getLogger('sabp').info(
+                'No info of elapsed seconds of file %s. Playing from start.' %
+                name)
             return 0
 
     def loadState(self):
         try:
-            with open(STATE_FILE, 'r') as stateFile:
+            with open(self.stateFilePath, 'r') as stateFile:
                 return json.load(stateFile)
         except (IOError, ValueError) as e:
             return {}
 
     def saveState(self, state):
-        with open(STATE_FILE, 'w') as stateFile:
+        with open(self.stateFilePath, 'w') as stateFile:
             json.dump(state, stateFile)
