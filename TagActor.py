@@ -13,7 +13,7 @@ class TagActor(pykka.ThreadingActor):
             tags = self.loadTags()
             self.stateActor.playFromLastState(tags[tag], fromStart)
         except KeyError:
-            logging.getLogger('zbap').error('No such tag %s' % tag)
+            logging.getLogger('sabp').error('No such tag %s' % tag)
 
     def addTag(self, name):
         tag = self.getTagActor().getTag().get()
@@ -35,8 +35,8 @@ class TagActor(pykka.ThreadingActor):
             with open(TAGS_FILE, 'r') as tagsFile:
                 return json.load(tagsFile)
         except (IOError, ValueError) as e:
-            logging.getLogger('zbap').error('Unable to load tag file %s' % TAGS_FILE)
-            logging.getLogger('zbap').exception(e)
+            logging.getLogger('sabp').error('Unable to load tag file %s' % TAGS_FILE)
+            logging.getLogger('sabp').exception(e)
             return {}
 
     def saveTags(self, state):

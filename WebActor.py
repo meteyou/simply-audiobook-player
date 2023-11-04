@@ -69,7 +69,7 @@ def runWebApp():
     try:
         app.run(host='0.0.0.0', port=8080)
     except Exception:
-        logging.getLogger('zbap').info('Shutting down web server.')
+        logging.getLogger('sabp').info('Shutting down web server.')
 
 class WebActor(pykka.ThreadingActor):
     def __init__(self, tagAct):

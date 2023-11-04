@@ -21,7 +21,7 @@ class NfcActor(TickActor):
                 self.doAction(tag)
 
     def doAction(self, tag):
-        logging.getLogger('zbap').info('Calling tagActor.playByTag() with tag: %s' % tag)
+        logging.getLogger('sabp').info('Calling tagActor.playByTag() with tag: %s' % tag)
         self.tagActor.playByTag(tag)
 
     def getCurrentTag(self):

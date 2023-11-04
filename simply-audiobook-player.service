@@ -1,0 +1,11 @@
+[Unit]
+Description=Simply Audiobook Player
+After=mpd.service
+
+[Service]
+WorkingDirectory=/users/pi/simply-audiobook-player
+ExecStart=/usr/bin/python simply-audiobook-player.py
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

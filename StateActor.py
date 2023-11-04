@@ -50,7 +50,7 @@ class StateActor(TickActor):
         try:
             return state["current"]["name"]
         except KeyError:
-            logging.getLogger('zbap').info('No info of currently played file. Probably a fresh start.')
+            logging.getLogger('sabp').info('No info of currently played file. Probably a fresh start.')
             return None
 
     def getElapsed(self, name):
@@ -58,7 +58,7 @@ class StateActor(TickActor):
         try:
             return state["played"][name]
         except KeyError:
-            logging.getLogger('zbap').info('No info of elapsed seconds of file %s. Playing from start.' % name)
+            logging.getLogger('sabp').info('No info of elapsed seconds of file %s. Playing from start.' % name)
             return 0
 
     def loadState(self):

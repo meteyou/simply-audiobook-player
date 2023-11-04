@@ -12,18 +12,21 @@ sleepSeconds = 0.5
 rewindSecondsWhenResuming = -5 * 60
 pleaseContinue = True
 
+
 def quitGracefully(*args):
     global pleaseContinue
-    logging.getLogger('zbap').info('Received SIGINT.')
+    logging.getLogger('sabp').info('Received SIGINT.')
     pleaseContinue = False
+
 
 def run():
     global pleaseContinue
     signal.signal(signal.SIGINT, quitGracefully)
 
-    logging.basicConfig(filename='zbap.log', format="%(asctime)s [%(module)s.%(funcName)s] %(levelname)s: %(message)s")
+    logging.basicConfig(filename='simply-audiobook-player.log',
+                        format="%(asctime)s [%(module)s.%(funcName)s] %(levelname)s: %(message)s")
     logging.getLogger('pykka').setLevel(logging.DEBUG)
-    logging.getLogger('zbap').setLevel(logging.DEBUG)
+    logging.getLogger('sabp').setLevel(logging.DEBUG)
 
     mpdActor = MpdActor.start().proxy()
     stateActor = StateActor.start(mpdActor, sleepSeconds).proxy()
@@ -42,12 +45,13 @@ def run():
 
             sleep(sleepSeconds)
     except KeyboardInterrupt:
-        logging.getLogger('zbap').info('Received KeyboardInterrupt.')
+        logging.getLogger('sabp').info('Received KeyboardInterrupt.')
 
-    logging.getLogger('zbap').info('Stopping...')
+    logging.getLogger('sabp').info('Stopping...')
 
     mpdActor.pause()
     pykka.ActorRegistry.stop_all()
+
 
 if __name__ == "__main__":
     run()
