@@ -6,6 +6,14 @@ import shutil
 from bottle import Bottle, template, redirect
 
 
+def sizeof_fmt(num, suffix="B"):
+    for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
+        if abs(num) < 1024.0:
+            return f"{num:3.1f}{unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f}Yi{suffix}"
+
+
 class WebActor(pykka.ThreadingActor):
     def __init__(self, config, tagActor):
         super(WebActor, self).__init__()
@@ -32,8 +40,10 @@ class WebActor(pykka.ThreadingActor):
 
     def _index(self):
         total, used, free = shutil.disk_usage(self._fileDirPath)
-        return template('index', items=self._getItems(), totalMem=total,
-                        freeMem=free)
+        return template('index',
+                        items=self._getItems(),
+                        totalSpace=sizeof_fmt(total),
+                        freeSpace=sizeof_fmt(free))
 
     def _add(self, name):
         self._tagActor.addTag(name).get()
