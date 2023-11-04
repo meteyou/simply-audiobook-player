@@ -8,15 +8,15 @@ class StateActor(TickActor):
     def __init__(self, config, mpdActor):
         super(StateActor, self).__init__(config)
 
-        self.config = config
-        self.mpdActor = mpdActor
+        self._config = config
+        self._mpdActor = mpdActor
 
-        self.stateFilePath = config.get('StateActor', 'stateFilePath',
+        self._stateFilePath = config.get('StateActor', 'stateFilePath',
                                      fallback='data/state.json')
 
     def doTick(self):
 
-        current = self.mpdActor.getCurrentSong().get()
+        current = self._mpdActor.getCurrentSong().get()
         if current is None:
             return
 
@@ -38,7 +38,7 @@ class StateActor(TickActor):
         if not fromStart:
             elapsed = self.getElapsed(name)
 
-        self.mpdActor.playByNameFrom(name, elapsed)
+        self._mpdActor.playByNameFrom(name, elapsed)
 
     def playLast(self, relativeElapsed=0):
         name = self.getCurrent()
@@ -47,7 +47,7 @@ class StateActor(TickActor):
             if elapsed < 0:
                 elapsed = 0
 
-            self.mpdActor.playByNameFrom(name, elapsed)
+            self._mpdActor.playByNameFrom(name, elapsed)
 
     def getCurrent(self):
         state = self.loadState()
@@ -70,11 +70,11 @@ class StateActor(TickActor):
 
     def loadState(self):
         try:
-            with open(self.stateFilePath, 'r') as stateFile:
+            with open(self._stateFilePath, 'r') as stateFile:
                 return json.load(stateFile)
         except (IOError, ValueError) as e:
             return {}
 
     def saveState(self, state):
-        with open(self.stateFilePath, 'w') as stateFile:
+        with open(self._stateFilePath, 'w') as stateFile:
             json.dump(state, stateFile)
