@@ -6,7 +6,7 @@ After=mpd.service
 Type=simple
 User=pi
 WorkingDirectory=/users/pi/simply-audiobook-player
-ExecStart=/usr/bin/python simply-audiobook-player.py
+ExecStart=/home/pi/simply-audiobook-player-env/bin/python simply-audiobook-player.py
 KillSignal=SIGINT
 
 [Install]
