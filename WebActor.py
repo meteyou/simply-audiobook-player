@@ -1,8 +1,8 @@
 from subprocess import Popen, PIPE
-import logging
 import os
 import pykka
 import re
+import shutil
 from bottle import Bottle, template, redirect
 
 
@@ -31,7 +31,7 @@ class WebActor(pykka.ThreadingActor):
         self._app.run(host=self._host, port=self._port)
 
     def _index(self):
-        total, free = self._getDiskInfo()
+        total, used, free = shutil.disk_usage(self._fileDirPath)
         return template('index', items=self._getItems(), totalMem=total,
                         freeMem=free)
 
@@ -50,18 +50,6 @@ class WebActor(pykka.ThreadingActor):
     def _play_from_start(self, tag):
         self._tagActor.playByTag(tag, fromStart=True)
         return 'Called tagActor with tag: %s and fromStart=True\n' % tag
-
-    def _getDiskInfo(self):
-        p = Popen("df -h .", shell=True, stdout=PIPE, stderr=PIPE)
-        out, err = p.communicate()
-        m = re.match("([0-9KMGTP\.]+)[\s]+[0-9KMGTP\.]+[\s]+([0-9KMGTP\.]+)",
-                     out.decode('utf-8'))
-        total = "N/A"
-        free = "N/A"
-        if m is not None:
-            total = m.group(1)
-            free = m.group(2)
-        return total, free
 
     def _getItems(self, **k):
         currentFiles = sorted(os.listdir(self._fileDirPath))
