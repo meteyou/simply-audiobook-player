@@ -3,6 +3,8 @@ Description=Simply Audiobook Player
 After=mpd.service
 
 [Service]
+Type=simple
+User=pi
 WorkingDirectory=/users/pi/simply-audiobook-player
 ExecStart=/usr/bin/python simply-audiobook-player.py
 KillSignal=SIGINT
