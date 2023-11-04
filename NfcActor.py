@@ -1,6 +1,5 @@
 import logging
-import re
-from subprocess import Popen, PIPE
+from mfrc522 import SimpleMFRC522
 from TickActor import TickActor
 
 
@@ -10,6 +9,7 @@ class NfcActor(TickActor):
 
         self._config = config
         self._tagActor = tagActor
+        self._reader = SimpleMFRC522()
 
         self._currentTag = None
         self._longPressInSeconds = config.getfloat('DEFAULT',
@@ -19,6 +19,7 @@ class NfcActor(TickActor):
     def doTick(self):
         tag = self.getTag()
         if tag is not self._currentTag:
+            logging.getLogger('sabp').info('RFID read %s.' % tag)
             self._currentTag = tag
             if tag is not None:
                 self.doAction(tag)
@@ -32,11 +33,6 @@ class NfcActor(TickActor):
         return self._currentTag
 
     def getTag(self):
-        p = Popen("nfc-list", shell=True, stdout=PIPE, stderr=PIPE)
-        out, err = p.communicate()
-        for line in out.decode("utf-8").split("\n"):
-            m = re.match(r"[\s]*UID \(NFCID1\): ([a-z0-9 ]+)\b", line)
-            if m:
-                return m.group(1).replace(" ", "")
+        id, text = self._reader.read()
 
-        return None
+        return text

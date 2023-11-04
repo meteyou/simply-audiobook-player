@@ -3,6 +3,7 @@ from time import sleep
 import configparser
 import logging
 import pykka
+import RPi.GPIO as GPIO
 import signal
 
 from MpdActor import MpdActor
@@ -61,6 +62,7 @@ def run():
 
     logging.getLogger('sabp').info('Stopping...')
 
+    GPIO.cleanup()
     mpdActor.pause()
     pykka.ActorRegistry.stop_all()
 
