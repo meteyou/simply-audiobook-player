@@ -5,7 +5,7 @@ import re
 import shutil
 from bottle import Bottle, template, redirect
 
-
+# size formatting from https://stackoverflow.com/a/1094933/1166086
 def sizeof_fmt(num, suffix="B"):
     for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
         if abs(num) < 1024.0:
