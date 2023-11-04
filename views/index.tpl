@@ -2,7 +2,7 @@
 <head></head>
 <body>
   <h1>Simply Audiobook Player</h1>
-  <p>Total: <em>{{totalMem}}</em>. Free: <em>{{freeMem}}</em>.</p>
+  <p>Total: <em>{{totalSpace}}</em>. Free: <em>{{freeSpace}}</em>.</p>
   <table>
   % for item in items:
     <tr>
