@@ -1,9 +1,9 @@
-from subprocess import Popen, PIPE
-import os
 import pykka
-import re
+from os.path import join, dirname
+from os import listdir
 import shutil
-from bottle import Bottle, template, redirect
+from bottle import Bottle, redirect, route, static_file, template, url
+
 
 # size formatting from https://stackoverflow.com/a/1094933/1166086
 def sizeof_fmt(num, suffix="B"):
@@ -25,44 +25,48 @@ class WebActor(pykka.ThreadingActor):
         self._fileDirPath = config.get('WebActor', 'fileDirPath',
                                        fallback='/var/lib/mpd/music/')
         self._app = Bottle()
-        self._route()
-
-    def _route(self):
-        self._app.route('/', callback=self._index)
-        self._app.route('/add/<name>', callback=self._add)
-        self._app.route('/remove/<tag>', callback=self._remove)
-        self._app.route('/play/<tag>', callback=self._play)
-        self._app.route('/play/<tag>/fromStart',
-                        callback=self._play_from_start)
 
     def startServer(self):
+        self._setup_routes()
         self._app.run(host=self._host, port=self._port)
 
-    def _index(self):
-        total, used, free = shutil.disk_usage(self._fileDirPath)
-        return template('index',
-                        items=self._getItems(),
-                        totalSpace=sizeof_fmt(total),
-                        freeSpace=sizeof_fmt(free))
+    def _setup_routes(self):
+        @self._app.route('/assets/<filepath:path>', name='assets')
+        def assets(filepath):
+            return static_file(filepath, root=join(dirname(__file__), 'assets'))
 
-    def _add(self, name):
-        self._tagActor.addTag(name).get()
-        redirect('/')
+        @self._app.route('/add/<name>', name='add')
+        def add(name):
+            self._tagActor.addTag(name).get()
+            redirect('/')
 
-    def _remove(self, tag):
-        self._tagActor.removeTag(tag).get()
-        redirect('/')
+        @self._app.route('/remove/<tag>', name='remove')
+        def remove(tag):
+            self._tagActor.removeTag(tag).get()
+            redirect('/')
 
-    def _play(self, tag):
-        self._tagActor.playByTag(tag)
-        return 'Called tagActor with tag: %s\n' % tag
+        @self._app.route('/play/<tag>', name='play')
+        def play(tag):
+            self._tagActor.playByTag(tag)
+            return 'Called tagActor with tag: %s\n' % tag
 
-    def _play_from_start(self, tag):
-        self._tagActor.playByTag(tag, fromStart=True)
-        return 'Called tagActor with tag: %s and fromStart=True\n' % tag
+        @self._app.route('/play/<tag>/fromStart', name='play_from_start')
+        def play_from_start(tag):
+            self._tagActor.playByTag(tag, fromStart=True)
+            return 'Called tagActor with tag: %s and fromStart=True\n' % tag
+
+        @self._app.route('/')
+        def index():
+            total, used, free = shutil.disk_usage(self._fileDirPath)
+            return template('index',
+                            items=self._getItems(),
+                            totalSpace=sizeof_fmt(total),
+                            freeSpace=sizeof_fmt(free),
+                            url=self._app.get_url,
+                            current_page='audiobooks')
 
     def _getItems(self, **k):
-        currentFiles = sorted(os.listdir(self._fileDirPath))
+        currentFiles = sorted(listdir(self._fileDirPath))
         tags = {name: tag for tag, name in
                 self._tagActor.loadTags().get().items()}
 
