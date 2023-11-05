@@ -1,7 +1,7 @@
 #!/bin/bash
-CURRENT_PID=`pgrep -f "python Zbap.py"`
+CURRENT_PID=`pgrep -f "/home/pi/simply-audiobook-player-env/bin/python simply-audiobook-player.py"`
 if [ -n "${CURRENT_PID}" ]; then
     kill -SIGINT $CURRENT_PID
 else
-    echo "Zbap is not running."
+    echo "simply-audiobook-player is not running."
 fi
