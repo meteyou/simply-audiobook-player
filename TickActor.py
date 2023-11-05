@@ -1,4 +1,5 @@
 import pykka
+import time
 
 
 class TickActor(pykka.ThreadingActor):
@@ -21,6 +22,8 @@ class TickActor(pykka.ThreadingActor):
                 self.doTick()
             finally:
                 self._intervalCounter = 0
+
+        time.sleep(self._sleepSeconds)
 
     def doTick(self):
         pass

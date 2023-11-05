@@ -16,12 +16,12 @@ class TagActor(pykka.ThreadingActor):
     def playByTag(self, tag, fromStart=False):
         try:
             tags = self.loadTags()
-            self._stateActor.playFromLastState(tags[tag], fromStart)
+            self._stateActor.playFromLastState(tags[str(tag)], fromStart)
         except KeyError:
             logging.getLogger('sabp').error('No such tag %s' % tag)
 
     def addTag(self, name):
-        tag = self.getTagActor().getTag().get()
+        tag = self._getNfcActor().getTag().get()
         if tag is not None:
             tags = self.loadTags()
             tags[tag] = name
@@ -32,7 +32,7 @@ class TagActor(pykka.ThreadingActor):
         del tags[tag]
         self.saveTags(tags)
 
-    def getTagActor(self):
+    def _getNfcActor(self):
         return pykka.ActorRegistry.get_by_class_name("NfcActor")[0].proxy()
 
     def loadTags(self):
