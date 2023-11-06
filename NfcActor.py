@@ -20,24 +20,23 @@ class NfcActor(TickActor):
         tag = self.getTag()
 
         # set new tag, if it is different from the current one
-        if tag != self._currentTag:
+        if str(tag) != self._currentTag:
             logging.getLogger('sabp').info('RFID read %s.' % tag)
-            self._currentTag = tag
+            self._currentTag = str(tag)
             if tag is not None:
                 self._doAction(tag)
 
     def _doAction(self, tag):
         logging.getLogger('sabp').info(
             'Calling tagActor.playByTag() with tag: %s' % tag)
-        self._tagActor.playByTag(tag)
+        self._tagActor.playByTag(str(tag))
 
     def getCurrentTag(self):
         return self._currentTag
 
     def getTag(self):
         try:
-            id = self._reader.read_id_no_block()
-            return str(id)
+            return self._reader.read_id_no_block()
         except Exception as e:
             logging.getLogger('sabp').error('Error reading RFID tag.')
             logging.getLogger('sabp').exception(e)

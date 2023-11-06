@@ -24,7 +24,7 @@ class TagActor(pykka.ThreadingActor):
         tag = self._getNfcActor().getTag().get()
         if tag is not None:
             tags = self.loadTags()
-            tags[tag] = name
+            tags[str(tag)] = name
             self.saveTags(tags)
 
     def removeTag(self, tag):
