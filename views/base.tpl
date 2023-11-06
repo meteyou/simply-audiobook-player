@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link href="{{ url('assets', filepath='css/tailwind.css') }}" rel="stylesheet" type="text/css"/>
 </head>
-<body class="h-full">
+<body class="h-full" data-theme="light">
 <div class="min-h-full">
     <nav class="bg-gray-800">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
