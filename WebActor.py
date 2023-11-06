@@ -1,6 +1,6 @@
 import pykka
 from os.path import join, dirname
-from os import listdir
+from os import listdir, stat
 import shutil
 from bottle import Bottle, redirect, route, static_file, template, url
 
@@ -35,13 +35,13 @@ class WebActor(pykka.ThreadingActor):
         def assets(filepath):
             return static_file(filepath, root=join(dirname(__file__), 'assets'))
 
-        @self._app.route('/add/<name>', name='add')
-        def add(name):
+        @self._app.route('/addTag/<name>', name='addTag')
+        def addTag(name):
             self._tagActor.addTag(name).get()
             redirect('/')
 
-        @self._app.route('/remove/<tag>', name='remove')
-        def remove(tag):
+        @self._app.route('/removeTag/<tag>', name='removeTag')
+        def removeTag(tag):
             self._tagActor.removeTag(tag).get()
             redirect('/')
 
@@ -58,11 +58,17 @@ class WebActor(pykka.ThreadingActor):
         @self._app.route('/')
         def index():
             total, used, free = shutil.disk_usage(self._fileDirPath)
+            usedPercent = round(used / total * 100, 0)
+            freePercent = round(free / total * 100, 0)
             return template('index',
                             items=self._getItems(),
+                            freePercent=freePercent,
+                            usedPercent=usedPercent,
                             totalSpace=sizeof_fmt(total),
                             freeSpace=sizeof_fmt(free),
+                            usedSpace=sizeof_fmt(used),
                             url=self._app.get_url,
+                            sizeof_fmt=sizeof_fmt,
                             current_page='audiobooks')
 
     def _getItems(self, **k):
@@ -72,9 +78,14 @@ class WebActor(pykka.ThreadingActor):
 
         filesTagArray = []
         for fileName in currentFiles:
+            file_stats = stat(join(self._fileDirPath, fileName))
+
             if fileName in tags:
-                filesTagArray.append({"name": fileName, "tag": tags[fileName]})
+                filesTagArray.append({"name": fileName,
+                                      "size": file_stats.st_size,
+                                      "tag": tags[fileName]})
             else:
-                filesTagArray.append({"name": fileName, "tag": None})
+                filesTagArray.append({"name": fileName,
+                                      "size": file_stats.st_size, "tag": None})
 
         return filesTagArray
