@@ -53,7 +53,8 @@ class WebActor(pykka.ThreadingActor):
         @self._app.route('/play/<tag>/fromStart', name='play_from_start')
         def play_from_start(tag):
             self._tagActor.playByTag(tag, fromStart=True)
-            return 'Called tagActor with tag: %s and fromStart=True\n' % tag
+            return template('playFromStart', tag=tag,
+                            url=self._app.get_url)
 
         @self._app.route('/')
         def index():
