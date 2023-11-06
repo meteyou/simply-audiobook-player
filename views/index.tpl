@@ -1,4 +1,4 @@
-% rebase('base.tpl', title='Audiobooks', current_page=current_page)
+% rebase('base.tpl', title='Audiobooks')
 
 <div class="mb-10 text-right">
   <div class="stats stats-horizontal shadow">

@@ -48,7 +48,7 @@ class WebActor(pykka.ThreadingActor):
         @self._app.route('/play/<tag>', name='play')
         def play(tag):
             self._tagActor.playByTag(tag)
-            return 'Called tagActor with tag: %s\n' % tag
+            return template('play', tag=tag, url=self._app.get_url)
 
         @self._app.route('/play/<tag>/fromStart', name='play_from_start')
         def play_from_start(tag):
@@ -68,8 +68,7 @@ class WebActor(pykka.ThreadingActor):
                             freeSpace=sizeof_fmt(free),
                             usedSpace=sizeof_fmt(used),
                             url=self._app.get_url,
-                            sizeof_fmt=sizeof_fmt,
-                            current_page='audiobooks')
+                            sizeof_fmt=sizeof_fmt,)
 
     def _getItems(self, **k):
         currentFiles = sorted(listdir(self._fileDirPath))

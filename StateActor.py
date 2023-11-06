@@ -34,8 +34,6 @@ class StateActor(TickActor):
         if name == self._getCurrent():
             fromStart = True
 
-        print(name, fromStart, self._getCurrent())
-
         elapsed = 0
         if not fromStart:
             elapsed = self._getElapsed(name)
