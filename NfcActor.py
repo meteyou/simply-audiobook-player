@@ -35,5 +35,10 @@ class NfcActor(TickActor):
         return self._currentTag
 
     def getTag(self):
-        id, text = self._reader.read()
-        return str(id)
+        try:
+            id = self._reader.read_id_no_block()
+            return str(id)
+        except Exception as e:
+            logging.getLogger('sabp').error('Error reading RFID tag.')
+            logging.getLogger('sabp').exception(e)
+            return None
