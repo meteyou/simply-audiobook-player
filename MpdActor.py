@@ -1,4 +1,3 @@
-import configparser
 import logging
 from mpd import MPDClient, CommandError
 import pykka
@@ -24,6 +23,12 @@ class MpdActor(pykka.ThreadingActor):
             elapsed = int(float(self._client.status()["elapsed"]))
 
             return {"name": name, "elapsed": elapsed}
+        except KeyError:
+            return None
+
+    def getCurrentState(self):
+        try:
+            return self._client.status()["state"]
         except KeyError:
             return None
 

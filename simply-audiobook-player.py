@@ -6,6 +6,7 @@ import pykka
 import RPi.GPIO as GPIO
 import signal
 
+from LcdActor import LcdActor
 from MpdActor import MpdActor
 from NfcActor import NfcActor
 from StateActor import StateActor
@@ -41,6 +42,7 @@ def run():
     logging.getLogger('sabp').setLevel(logging.DEBUG)
 
     mpdActor = MpdActor.start(config).proxy()
+    lcdActor = LcdActor.start(config, mpdActor).proxy()
     stateActor = StateActor.start(config, mpdActor).proxy()
 
     tagActor = TagActor.start(config, stateActor).proxy()
@@ -55,6 +57,7 @@ def run():
         while pleaseContinue:
             stateActor.tick()
             nfcActor.tick()
+            lcdActor.tick()
 
             sleep(sleepSeconds)
     except KeyboardInterrupt:

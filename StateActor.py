@@ -15,7 +15,6 @@ class StateActor(TickActor):
                                      fallback='data/state.json')
 
     def doTick(self):
-
         current = self._mpdActor.getCurrentSong().get()
         if current is None:
             return

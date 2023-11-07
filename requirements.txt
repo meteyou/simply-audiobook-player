@@ -3,3 +3,5 @@ mfrc522==0.0.7
 Pykka==4.0.1
 python-mpd2==3.1.0
 spidev==3.6
+RPLCD==1.3.1
+smbus2==0.4.3
