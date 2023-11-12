@@ -26,7 +26,7 @@ class LcdActor(TickActor):
             self._lcd.cursor_pos = (0, 0)
             self._lcd.write_string(state.capitalize())
 
-        if state == 'play':
+        if state == 'play' or state == 'pause':
             duration = int(song['duration'] / 60)
             elapsed = int(song['elapsed'] / 60)
             text = '%s/%s' % (elapsed, duration)
