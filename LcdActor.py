@@ -13,6 +13,7 @@ class LcdActor(TickActor):
 
         self._lastState = None
         self._lastSong = None
+        self._textPosition = 0
 
     def doTick(self):
         state = self._MpdActor.getCurrentState().get()
@@ -34,8 +35,15 @@ class LcdActor(TickActor):
             self._lcd.write_string(text)
 
         if song is not None:
+            self._textPosition += 1
+
+            namesplits = [song['name'][i:i + 16] for i in
+                          range(0, len(song['name']), 16)]
+            if self._textPosition >= len(namesplits):
+                self._textPosition = 0
+
             self._lcd.cursor_pos = (1, 0)
-            self._lcd.write_string(song['name'])
+            self._lcd.write_string(namesplits[self._textPosition])
             self._lastSong = song['name']
         else:
             self._lastSong = None
