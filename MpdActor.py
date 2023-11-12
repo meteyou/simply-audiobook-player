@@ -21,8 +21,9 @@ class MpdActor(pykka.ThreadingActor):
         try:
             name = self._client.currentsong()["file"]
             elapsed = int(float(self._client.status()["elapsed"]))
+            duration = int(float(self._client.status()["duration"]))
 
-            return {"name": name, "elapsed": elapsed}
+            return {"name": name, "elapsed": elapsed, "duration": duration}
         except KeyError:
             return None
 

@@ -18,20 +18,20 @@ class LcdActor(TickActor):
         state = self._MpdActor.getCurrentState().get()
         song = self._MpdActor.getCurrentSong().get()
 
-        if (song is not None and song['name'] == self._lastSong and
-                state == self._lastState):
-            return
+        if state is not None or song is not None:
+            self._lcd.clear()
 
         if state is not None:
-            if state == 'play':
-                self._lcd.clear()
-                self._lcd.write_string('Playing')
-            elif state == 'pause':
-                self._lcd.clear()
-                self._lcd.write_string('Paused')
-            elif state == 'stop':
-                self._lcd.clear()
-                self._lcd.write_string('Stopped')
+            self._lcd.cursor_pos = (0, 0)
+            self._lcd.write_string(state.capitalize())
+
+        if state == 'play':
+            duration = int(song['duration'] / 60)
+            elapsed = int(song['elapsed'] / 60)
+            text = '%s/%s' % (elapsed, duration)
+            textLength = len(text)
+            self._lcd.cursor_pos = (0, 16 - textLength)
+            self._lcd.write_string(text)
 
         if song is not None:
             self._lcd.cursor_pos = (1, 0)
